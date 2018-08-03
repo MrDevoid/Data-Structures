@@ -6,19 +6,31 @@ public class FibonacciHeap<T extends Comparable<T>> {
 	private Node<T> min;
 	private Integer numElems;
 
+	/**
+	*Create a empty fibonacci heap
+	*/
 	public FibonacciHeap() {
 		numElems=0;
 	}
 
+	/**
+	* Return the minimun value of the heap
+	*/
 	public T getMin() {
 		return min.getElem();
 	}
 
+	/**
+	* Insert a new element (Comparable) in the heap
+	*/
 	public void insert(T newElemToInsert) {
 		Node<T> newNodeToInsert = new Node<T>(newElemToInsert);
 		insertNode(newNodeToInsert);
 	}
 
+	/**
+	* Insert "otherHeapToJoin" in the heap making the union of both
+	*/
 	public void union(FibonacciHeap<T> otherHeapToJoin) {
 		Node<T> auxNodeToChange = otherHeapToJoin.getMinNode().getLeftSiblingNode();
 		otherHeapToJoin.getMinNode().setLeftSiblingNode(min.getLeftSiblingNode());
@@ -31,6 +43,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		numElems += otherHeapToJoin.getNumElems();
 	}
 
+	/**
+	* Extract the minimun element of the heap rearranging it and return the node with the minimun element
+	*/
 	public Node<T> extractMin() {
 		Node<T> nodeToExtract = min;
 		if(nodeToExtract != null) {
@@ -57,10 +72,17 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		return nodeToExtract;
 	}
 
+	/**
+	* Return the number of elements of the heap
+	*/
 	public Integer getNumElems() {
 		return numElems;
 	}
 
+	/**
+	* Decrease the element of the node "nodeToChange" to "newElem". It throws an exception if "newElem" is higher than the element of the node
+	* Finally the heap is rearranging.
+	*/
 	public void decreaseKey(Node<T> nodeToChange,T newElem) throws ElemError {
 		if(newElem.compareTo(nodeToChange.getElem())==Node.HIGHER) {
 			throw new ElemError("El elemento introducido es mayor o igual que el elemento existente y por lo tanto no puede decrementarse");
@@ -76,6 +98,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		}
 	}
 
+	/**
+	* Delete the node "nodeToDelete"
+	*/
 	public void delete(Node<T> nodeToDelete) {
 		try {
 			decreaseKey(nodeToDelete,getMin());
@@ -85,6 +110,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		}
 	}
 
+	/**
+	* Show the heap
+	*/
 	public void showHeap() {
 		if(min!=null) {
 			System.out.print(" -> " + getMinNode().getElem());
@@ -99,6 +127,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		}
 	}
 
+	/**
+	* Insert a new node into the left of the minimun element
+	*/
 	public void insertNode(Node<T> newNodeToInsert) {
 		if(min==null) {
 			min=newNodeToInsert;
@@ -117,6 +148,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		numElems++;
 	}
 	
+	/**
+	* Auxiliar method to show the heap
+	*/
 	private void showHeap(Node<T> node,Node<T> endNode) {
 		if(node!=endNode) {
 			System.out.print(" -> " + node.getElem());
@@ -133,10 +167,16 @@ public class FibonacciHeap<T extends Comparable<T>> {
 
 	}
 
+	/**
+	* Return the node that contains the minimnum element
+	*/
 	private Node<T> getMinNode(){
 		return min;
 	}
 
+	/**
+	* Rearranging the heap joining the subtrees that has the same degree.
+	*/
 	private void consolidate() {
 		int size = (int) (Math.log10(numElems)/Math.log10(2)) +1;
 		ArrayList<Node<T>> listOfHeaps = new ArrayList<Node<T>>();
@@ -174,6 +214,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		}
 	}
 
+	/**
+	* Join two node nodes making one of them the child of the other
+	*/
 	private void heapLink(Node<T> childNode, Node<T> fatherNode) {
 		removeNodeFromRootList(childNode);
 		if(fatherNode.getChild()!=null) {
@@ -192,6 +235,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		childNode.setFather(fatherNode);
 	}
 
+	/**
+	* Remove the node "nodeToRemove" from the root list of the heap
+	*/
 	private void removeNodeFromRootList(Node<T> nodeToRemove) {
 		nodeToRemove.getLeftSiblingNode().setRightSiblingNode(nodeToRemove.getRightSiblingNode());
 		nodeToRemove.getRightSiblingNode().setLeftSiblingNode(nodeToRemove.getLeftSiblingNode());
@@ -199,6 +245,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		nodeToRemove.setRightSiblingNode(nodeToRemove);
 	}
 
+	/**
+	* Return the right sibling of the node or null in case that "actualNode" was the last one of the list
+	*/
 	private Node<T> next(Node<T> actualNode, Node<T> firstChild){
 		if(actualNode.getRightSiblingNode()!=firstChild) {
 			return actualNode.getRightSiblingNode();
@@ -206,6 +255,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		else return null;
 	}
 
+	/**
+	* Insert "nodeChanged" in the root list, removing it from the child list of "fatherOfNodeChanged"
+	*/
 	private void cut(Node<T> nodeChanged, Node<T> fatherOfNodeChanged) {
 		if(nodeChanged.getRightSiblingNode()!=nodeChanged) {
 			nodeChanged.getRightSiblingNode().setLeftSiblingNode(nodeChanged.getLeftSiblingNode());
@@ -223,6 +275,9 @@ public class FibonacciHeap<T extends Comparable<T>> {
 		nodeChanged.setMarked(false);
 	}
 
+	/**
+	* Recursive application of cut
+	*/
 	private void cascadingCut(Node<T> fatherOfNodeChanged) {
 		Node<T> fatherOfFather = fatherOfNodeChanged.getFather();
 		if(fatherOfFather!=null) {
